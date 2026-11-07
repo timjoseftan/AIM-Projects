@@ -2,11 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+const FORCE = null;
+
 async function getTask(id) {
+    if (FORCE === 'slow') await new Promise((resolve) => setTimeout(resolve, 3000))
+    if (FORCE === 'error') throw new Error('Forced error')
+
     const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`)
+    
     if (!response.ok) throw new Error('API responded with ${response.status}');
 
     const data = await response.json().catch(() => null);
+
+    if (FORCE === 'empty') return null;
 
     if (!data) return null;
 
@@ -32,11 +40,12 @@ function TaskDetail(){
         queryFn: () => getTask(id),
         retry: false
     });
-
+    
     return (
         <main>
             <Link to="/tasks"> Back to Tasks </Link>
-            {isLoading && <p>Loading Tasks...</p>}
+            <br/><br/>
+            {isLoading && <p>Loading Task Detail...</p>}
       
             {isError && (
                 <p role="alert">Something went wrong loading the Task. Please try again.</p>
@@ -65,8 +74,8 @@ function TaskDetail(){
 
                 <section class="border-b border-gray-100 p-5">
                     <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Completion status</h3>
-                    <span className={`font-semibold text-xs ${isCompleted ? 'text-green-600' : 'text-amber-600'}`}>
-                        {isCompleted ? 'Completed' : 'Not completed'}
+                    <span className={`font-semibold text-xs ${isCompleted == null ? task.completed  ? 'text-green-600' : 'text-amber-600': isCompleted ? 'text-green-600' : 'text-amber-600'}`}>
+                        {isCompleted == null ? task.completed  ? 'Completed' : 'Not completed' : isCompleted ? 'Completed' : 'Not completed'}
                     </span>
                 </section>
 
@@ -74,7 +83,7 @@ function TaskDetail(){
                 <input
                     type="checkbox"
                     id={`task-toggle-${id}`}
-                    checked={isCompleted} 
+                    checked={isCompleted == null ? task.completed : isCompleted} 
                     onChange={toggleStatus}
                     className="h-4 w-4 accent-gray-800 cursor-pointer rounded border-gray-300 focus:ring-gray-500"
                     /> &nbsp; &nbsp; Mark as Completed

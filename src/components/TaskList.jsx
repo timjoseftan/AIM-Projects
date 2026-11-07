@@ -1,11 +1,8 @@
-import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Task from './Task';
 
 const PUBLIC_API_URL = 'https://jsonplaceholder.typicode.com/todos'
 
-// TEMPORARY test switch for the lab: set to 'slow', 'empty' or 'error' to force
-// that state, then set it back to null when you are done.
 const FORCE = 'slow';
 
 function normaliseApiProduct(task) {
@@ -39,11 +36,12 @@ function TasksList() {
     }
 
 
-  if (isLoading) return <p>Loading products...</p>
+  if (isLoading) return <p>Loading tasks...</p>
   if (isError) {
-    return <p role="alert">Something went wrong loading products. Please try again.</p>
+    return <p role="alert">Something went wrong loading tasks. Please try again.</p>
   }
   if (tasks.length === 0) return <p>No tasks yet.</p>
+
  // <p className="task-list_-count">Tasks Completed:  {completedTasks} out of {tasks.length} </p>
   return (
     <section className="task-list">
